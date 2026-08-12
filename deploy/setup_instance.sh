@@ -17,14 +17,14 @@ COMFY_DIR="$(dirname "$(find /root /workspace /opt /home -maxdepth 4 -type f -na
 if [ -z "$COMFY_DIR" ] || [ ! -f "$COMFY_DIR/main.py" ]; then
   echo "[h3] 未找到 ComfyUI，正在克隆..."
   COMFY_DIR=/root/ComfyUI
-  git clone https://gh-proxy.com/https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR" \
-    || git clone https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR"
+  git clone --depth 1 https://gh-proxy.com/https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR" \
+    || git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR"
 fi
 echo "[h3] ComfyUI: $COMFY_DIR"
 
 # 1.5) 安装 ComfyUI 依赖（torch 已就绪则只补其余小包）
 if ! "$PY" -c "import safetensors, einops, yaml" >/dev/null 2>&1; then
-  $PIP install -r "$COMFY_DIR/requirements.txt" || true
+  $PIP install --no-cache-dir -r "$COMFY_DIR/requirements.txt" || true
 fi
 
 # 2) 定位加速包（平台可能已把 repo_url 克隆到 /workspace 下）
