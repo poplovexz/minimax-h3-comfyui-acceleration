@@ -7,12 +7,17 @@ if [ -z "$COMFY_DIR" ] || [ ! -d "$COMFY_DIR" ]; then
   echo "错误: 找不到 ComfyUI 目录，请传入路径作为第一个参数" >&2
   exit 1
 fi
+case "$COMFY_DIR" in
+  */models) MODELS="$COMFY_DIR" ;;
+  *) MODELS="$COMFY_DIR/models" ;;
+esac
+
 UA="Mozilla/5.0"
 MS="https://modelscope.cn/models/Comfy-Org/MiniMax-H3/resolve/master"
 TURBO="https://modelscope.cn/models/larryvrh/MiniMax-H3-Turbo-Lora/resolve/master"
 
-mkdir -p "$COMFY_DIR/models/diffusion_models" "$COMFY_DIR/models/text_encoders" \
-         "$COMFY_DIR/models/vae" "$COMFY_DIR/models/loras"
+mkdir -p "$MODELS/diffusion_models" "$MODELS/text_encoders" \
+         "$MODELS/vae" "$MODELS/loras"
 
 dl() {
   local url="$1" dest="$2"
@@ -33,18 +38,18 @@ dl() {
 }
 
 dl "$MS/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors" \
-   "$COMFY_DIR/models/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"
+   "$MODELS/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"
 # ref2va（参考图生视频）体积大且吃磁盘配额，默认跳过；REF2VA=1 时下载
 if [ "${REF2VA:-0}" = "1" ]; then
   dl "$MS/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors" \
-     "$COMFY_DIR/models/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+     "$MODELS/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors"
 fi
 dl "$MS/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors" \
-   "$COMFY_DIR/models/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"
+   "$MODELS/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"
 dl "$MS/vae/minimax_h3_video_vae_fp16.safetensors" \
-   "$COMFY_DIR/models/vae/minimax_h3_video_vae_fp16.safetensors"
+   "$MODELS/vae/minimax_h3_video_vae_fp16.safetensors"
 dl "$MS/vae/minimax_h3_audio_vae_fp32.safetensors" \
-   "$COMFY_DIR/models/vae/minimax_h3_audio_vae_fp32.safetensors"
+   "$MODELS/vae/minimax_h3_audio_vae_fp32.safetensors"
 dl "$TURBO/minimax_h3_turbo_v4_step600_ema.safetensors" \
-   "$COMFY_DIR/models/loras/minimax_h3_turbo_v4_step600_ema.safetensors"
+   "$MODELS/loras/minimax_h3_turbo_v4_step600_ema.safetensors"
 echo "全部模型下载完成（约 85 GB）"
