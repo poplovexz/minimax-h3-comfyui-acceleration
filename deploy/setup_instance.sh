@@ -17,8 +17,10 @@ COMFY_DIR="$(dirname "$(find /root /workspace /opt /home -maxdepth 4 -type f -na
 if [ -z "$COMFY_DIR" ] || [ ! -f "$COMFY_DIR/main.py" ]; then
   echo "[h3] 未找到 ComfyUI，正在克隆..."
   COMFY_DIR=/root/ComfyUI
-  git clone --depth 1 https://gh-proxy.com/https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR" \
-    || git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR"
+  # 平台内网 GitHub 代理（TLS 中间人，需跳过证书校验）优先，公网镜像兜底
+  GIT_SSL_NO_VERIFY=1 git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR" \
+    || git clone --depth 1 https://gh-proxy.com/https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR" \
+    || git clone --depth 1 https://gitee.com/mirrors/ComfyUI.git "$COMFY_DIR"
 fi
 echo "[h3] ComfyUI: $COMFY_DIR"
 
@@ -36,7 +38,7 @@ for d in "$SELF_DIR" /root/minimax-h3-comfyui-acceleration \
 done
 if [ -z "$ACC" ]; then
   ACC=/root/minimax-h3-comfyui-acceleration
-  git clone https://github.com/poplovexz/minimax-h3-comfyui-acceleration.git "$ACC" \
+  GIT_SSL_NO_VERIFY=1 git clone https://github.com/poplovexz/minimax-h3-comfyui-acceleration.git "$ACC" \
     || git clone https://gh-proxy.com/https://github.com/poplovexz/minimax-h3-comfyui-acceleration.git "$ACC"
 fi
 echo "[h3] 加速包: $ACC"
