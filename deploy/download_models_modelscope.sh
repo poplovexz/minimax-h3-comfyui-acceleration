@@ -34,8 +34,11 @@ dl() {
 
 dl "$MS/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors" \
    "$COMFY_DIR/models/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"
-dl "$MS/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors" \
-   "$COMFY_DIR/models/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+# ref2va（参考图生视频）体积大且吃磁盘配额，默认跳过；REF2VA=1 时下载
+if [ "${REF2VA:-0}" = "1" ]; then
+  dl "$MS/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors" \
+     "$COMFY_DIR/models/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+fi
 dl "$MS/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors" \
    "$COMFY_DIR/models/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"
 dl "$MS/vae/minimax_h3_video_vae_fp16.safetensors" \
