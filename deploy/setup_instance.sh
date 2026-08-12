@@ -13,7 +13,10 @@ if [ -x /opt/venv/bin/pip ]; then PIP=/opt/venv/bin/pip; else PIP="$PY -m pip"; 
 echo "[h3] Python: $PY"
 
 # 1) 定位 ComfyUI
-COMFY_DIR="$(dirname "$(find /root /workspace /opt /home -maxdepth 4 -type f -name main.py -path "*ComfyUI*" 2>/dev/null | head -1)")"
+COMFY_DIR="$(dirname "$(find /root /workspace /opt /home -maxdepth 4 -type f -path "*/ComfyUI/main.py" 2>/dev/null | head -1)")"
+if [ -z "$COMFY_DIR" ]; then
+  COMFY_DIR="$(dirname "$(find /root /workspace /opt /home -maxdepth 4 -type f -name main.py -path "*ComfyUI*" 2>/dev/null | head -1)")"
+fi
 if [ -z "$COMFY_DIR" ] || [ ! -f "$COMFY_DIR/main.py" ]; then
   echo "[h3] 未找到 ComfyUI，正在克隆..."
   COMFY_DIR=/root/ComfyUI
