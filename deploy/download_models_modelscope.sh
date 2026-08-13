@@ -8,8 +8,8 @@ case "$MODELS" in
   */ComfyUI) MODELS="$MODELS/models" ;;
 esac
 UA="Mozilla/5.0"
-MS="https://modelscope.cn/models/Comfy-Org/MiniMax-H3/resolve/master"
-TURBO="https://modelscope.cn/models/larryvrh/MiniMax-H3-Turbo-Lora/resolve/master"
+MS="$H3_MODEL_BASE_URL"
+TURBO="$H3_TURBO_BASE_URL"
 
 mkdir -p "$MODELS/diffusion_models" "$MODELS/text_encoders" "$MODELS/vae" "$MODELS/loras"
 exec 9>"$MODELS/.download.lock"

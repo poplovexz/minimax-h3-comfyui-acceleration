@@ -50,6 +50,20 @@ bash ../deploy/bootstrap.sh
 注意：当前 Radeon Cloud 模板的 `/workspace` 容量约 20GB，而 H3 模型总量超过该容量。
 若要求实例重构后模型立即可用，需要平台提供大于模型总量的持久盘，或把模型预装进容器镜像。
 
+## 用阿里云 ACR 从 GitHub 构建预装镜像
+
+仓库根目录的 `Dockerfile` 会构建一个可直接启动的镜像：包含 ROCm、ComfyUI、H3 加速节点、核心 H3 模型、SSH 和 JupyterLab。
+模型在 ACR 构建阶段从魔搭下载，默认包含文生视频/视频生成所需的核心权重；`ref2va` 是可选的大模型。
+
+在 ACR 个人版的 GitHub 自动构建配置中使用：
+
+- **代码源**：本仓库，分支 `main`
+- **Dockerfile 路径**：`/Dockerfile`
+- **构建上下文**：`/`
+- **构建参数**：默认 `H3_INCLUDE_REF2VA=0`；需要参考图生视频时改为 `1`
+
+构建完成后，把生成的镜像地址填回 AMD 模板的 Container Image。若 AMD 模板下拉框只显示平台预设而没有自定义镜像输入，需要 AMD 平台先登记该镜像，ACR 本身的构建已经由本仓库配置完成。
+
 ## 工作流使用建议
 
 - 草稿用 `h3-turbo8-t2v.json`（8 步），满意后换 `h3-spectrum-t2v.json` 或原生 20 步出正片

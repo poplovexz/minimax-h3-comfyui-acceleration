@@ -8,8 +8,8 @@ KEY="${1:-${SSH_PUBLIC_KEY:-}}"
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
 # 持久副本 -> 恢复
-if [ -f /workspace/ssh/authorized_keys ]; then
-  cat /workspace/ssh/authorized_keys >> /root/.ssh/authorized_keys
+if [ -f "$H3_SSH_DIR/authorized_keys" ]; then
+  cat "$H3_SSH_DIR/authorized_keys" >> /root/.ssh/authorized_keys
 fi
 if [ -n "$KEY" ]; then
   grep -qF "$KEY" /root/.ssh/authorized_keys 2>/dev/null || echo "$KEY" >> /root/.ssh/authorized_keys
@@ -21,7 +21,7 @@ if [ ! -s /root/.ssh/authorized_keys ]; then
 fi
 chmod 600 /root/.ssh/authorized_keys
 # 更新持久副本
-mkdir -p /workspace/ssh 2>/dev/null && cp /root/.ssh/authorized_keys /workspace/ssh/authorized_keys 2>/dev/null
+mkdir -p "$H3_SSH_DIR" 2>/dev/null && cp /root/.ssh/authorized_keys "$H3_SSH_DIR/authorized_keys" 2>/dev/null
 
 if [ ! -x /usr/sbin/sshd ]; then
   DEBIAN_FRONTEND=noninteractive apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq openssh-server
@@ -30,7 +30,7 @@ mkdir -p /run/sshd
 pgrep -x sshd >/dev/null 2>&1 || /usr/sbin/sshd
 sleep 1
 if pgrep -x sshd >/dev/null 2>&1; then
-  echo "[ssh] sshd 已运行；密钥持久副本: /workspace/ssh/authorized_keys"
+  echo "[ssh] sshd 已运行；密钥持久副本: $H3_SSH_DIR/authorized_keys"
 else
   echo "[ssh] sshd 启动失败" >&2
   exit 1

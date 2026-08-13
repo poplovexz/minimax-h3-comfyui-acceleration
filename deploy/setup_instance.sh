@@ -12,8 +12,8 @@ echo "[h3] Python: $PY"
 
 # 1) 定位/克隆 ComfyUI（优先 /workspace 持久盘）
 WS_OK=0
-WS_FREE=$(df --output=avail -BG /workspace 2>/dev/null | tail -1 | tr -dc 0-9)
-[ -d /workspace ] && [ "${WS_FREE:-0}" -ge 8 ] && WS_OK=1
+WS_FREE=$(df --output=avail -BG "$H3_WORKSPACE_ROOT" 2>/dev/null | tail -1 | tr -dc 0-9)
+[ -d "$H3_WORKSPACE_ROOT" ] && [ "${WS_FREE:-0}" -ge 8 ] && WS_OK=1
 COMFY_DIR=""
 for d in "$H3_COMFYUI_DIR" /root/ComfyUI; do
   [ -f "$d/main.py" ] && COMFY_DIR="$d" && break

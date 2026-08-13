@@ -6,7 +6,9 @@ mkdir -p "$H3_LOG_DIR" "$H3_RUNTIME_DIR"
 exec > >(tee -a "$H3_LOG_DIR/bootstrap.log") 2>&1
 echo "[h3] bootstrap 开始: $(date -Is)"
 
-bash "$SCRIPT_DIR/enable_ssh.sh"
+if ! bash "$SCRIPT_DIR/enable_ssh.sh"; then
+  echo "[h3] SSH 暂未配置，继续启动 ComfyUI；配置公钥后可再次运行 enable_ssh.sh"
+fi
 bash "$SCRIPT_DIR/setup_instance.sh"
 bash "$SCRIPT_DIR/start_comfyui.sh"
 
