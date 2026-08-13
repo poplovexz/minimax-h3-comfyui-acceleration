@@ -32,14 +32,23 @@ bash deploy/download_models_modelscope.sh ~/ComfyUI        # 从魔搭下载全�
 在 [developer.amd.com.cn/radeon/profile](https://developer.amd.com.cn/radeon/profile) 创建模板：
 
 - **Container Image**: 任选 ROCm ComfyUI 镜像（如 `comfyui_zimage_rocm7.2.1_ubuntu24.04_py3.12_pytorch_2.9`）
-- **Deploy Type**: `ComfyUI (one-click)`，端口 `8188`
-- **Start Command**:
+- **Deploy Type**: `Notebook (Jupyter / OpenCode)`
+- **GitHub Repo URL**: `https://github.com/poplovexz/minimax-h3-comfyui-acceleration`
+- **Branch**: `main`
+- **Notebook Path**: `notebooks/deploy_h3.ipynb`
+- **SSH Access**: 开启
+
+打开 Notebook 后只运行第一个代码单元：
 
 ```bash
-bash -lc 'git clone https://github.com/poplovexz/minimax-h3-comfyui-acceleration.git /root/h3acc || git clone https://gh-proxy.com/https://github.com/poplovexz/minimax-h3-comfyui-acceleration.git /root/h3acc; bash /root/h3acc/deploy/radeon_cloud_start.sh'
+bash ../deploy/bootstrap.sh
 ```
 
-实例首次启动会自动：安装加速包 → 从魔搭下载模型（断点续传，重启不重复下载）→ 启动 ComfyUI。
+启动单元会自动：恢复 SSH → 安装加速节点 → 启动带守护的 ComfyUI → 后台断点下载模型。
+重复运行不会重复启动服务，模型下载使用锁和 `.complete` 标记。
+
+注意：当前 Radeon Cloud 模板的 `/workspace` 容量约 20GB，而 H3 模型总量超过该容量。
+若要求实例重构后模型立即可用，需要平台提供大于模型总量的持久盘，或把模型预装进容器镜像。
 
 ## 工作流使用建议
 
@@ -51,7 +60,9 @@ bash -lc 'git clone https://github.com/poplovexz/minimax-h3-comfyui-acceleration
 ## 与上游的差异
 
 - 新增 `deploy/download_models_modelscope.sh`：魔搭模型下载（含 fl2va + ref2va 双 backbone）
-- 新增 `deploy/radeon_cloud_start.sh`：Radeon Cloud 模板启动脚本
+- 新增 `deploy/bootstrap.sh`、`deploy/start_comfyui.sh` 和 `deploy/comfyui_supervisor.sh`：幂等启动、服务自恢复
+- 新增 `deploy/config.sh`：路径、端口、模型目录均可通过环境变量覆盖
+- 更新 `notebooks/deploy_h3.ipynb`：首个单元一键恢复 SSH、启动 ComfyUI 和后台下载模型
 - 新增本中文说明
 - 其余内容与上游保持一致，可直接同步上游更新
 
