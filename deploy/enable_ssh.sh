@@ -24,7 +24,19 @@ chmod 600 /root/.ssh/authorized_keys
 mkdir -p "$H3_SSH_DIR" 2>/dev/null && cp /root/.ssh/authorized_keys "$H3_SSH_DIR/authorized_keys" 2>/dev/null
 
 if [ ! -x /usr/sbin/sshd ]; then
-  DEBIAN_FRONTEND=noninteractive apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq openssh-server
+  APT_TIMEOUT_SEC="${H3_APT_TIMEOUT_SEC:-180}"
+  APT_RETRIES="${H3_APT_RETRIES:-2}"
+  APT_OPTIONS=(
+    -o "Acquire::Retries=$APT_RETRIES"
+    -o "Acquire::http::Timeout=${H3_APT_HTTP_TIMEOUT_SEC:-20}"
+    -o "Acquire::https::Timeout=${H3_APT_HTTPS_TIMEOUT_SEC:-20}"
+  )
+  timeout "$APT_TIMEOUT_SEC" env DEBIAN_FRONTEND=noninteractive \
+    apt-get "${APT_OPTIONS[@]}" update -qq \
+    || { echo "[ssh] apt update 超时或失败，跳过 SSH 安装" >&2; exit 1; }
+  timeout "$APT_TIMEOUT_SEC" env DEBIAN_FRONTEND=noninteractive \
+    apt-get "${APT_OPTIONS[@]}" install -y -qq openssh-server \
+    || { echo "[ssh] openssh-server 安装超时或失败" >&2; exit 1; }
 fi
 mkdir -p /run/sshd
 pgrep -x sshd >/dev/null 2>&1 || /usr/sbin/sshd
