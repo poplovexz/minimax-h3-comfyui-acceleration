@@ -1,6 +1,6 @@
 #!/bin/bash
 # 从魔搭下载 MiniMax H3 模型，支持断点续传、锁和完成标记。
-set -u
+set -Eeuo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/config.sh"
 MODELS="${1:-$H3_MODELS_DIR}"
@@ -53,4 +53,9 @@ dl "$MS/vae/minimax_h3_audio_vae_fp32.safetensors" \
   "$MODELS/vae/minimax_h3_audio_vae_fp32.safetensors"
 dl "$TURBO/minimax_h3_turbo_v4_step600_ema.safetensors" \
   "$MODELS/loras/minimax_h3_turbo_v4_step600_ema.safetensors"
+if [ "${REF2VA:-0}" = "1" ]; then
+  touch "$MODELS/.ref2va.complete"
+else
+  touch "$MODELS/.core.complete"
+fi
 echo "全部模型下载完成"
